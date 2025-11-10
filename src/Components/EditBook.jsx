@@ -1,66 +1,74 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const EditBook = () => {
-  let { id } = useParams()
-  let navigate = useNavigate()
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  // Book data state including imagePath for existing image
-  let [data, updateData] = useState({
+  const [data, updateData] = useState({
     title: "",
     isbn: "",
-    numberOfCopies: 0,
+    numberOfCopies: "",
     author: "",
-    userId:localStorage.getItem("userid"),
+    userId: localStorage.getItem("userid"),
     imagePath: "",
-  })
+  });
 
-  console.log(localStorage.getItem("username"));
-   localStorage.getItem("username");
-  // State for selected new image file and preview URL
-  let [selectedFile, setSelectedFile] = useState(null)
-  let [previewUrl, setPreviewUrl] = useState("")
-  let [error, setError] = useState("")
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [error, setError] = useState("");
 
-  // Load existing book data
+  // ✅ Fetch existing book details
   useEffect(() => {
     axios.get(`http://localhost:8181/api/books/${id}`)
-      .then(response => {
+      .then((response) => {
         const book = response.data.data;
         updateData({
           title: book.title,
           isbn: book.isbn,
           numberOfCopies: book.numberOfCopies,
           author: book.author,
-          userId:localStorage.getItem("userid"),
-          imagePath: book.imagePath
+          userId: localStorage.getItem("userid"),
+          imagePath: book.imagePath,
         });
       })
-      .catch(err => setError(err.message || "Failed to load book"));
-  }, [id])
+      .catch((err) => setError(err.message || "Failed to load book"));
+  }, [id]);
 
-  // Generate preview URL when selectedFile changes
+  // ✅ Handle image preview
   useEffect(() => {
     if (!selectedFile) {
       setPreviewUrl("");
       return;
     }
-
     const objectUrl = URL.createObjectURL(selectedFile);
     setPreviewUrl(objectUrl);
-
-    // Cleanup URL object when component unmount or file changes
     return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile])
+  }, [selectedFile]);
 
-  // Handle file input change
+  // ✅ Handle image input
   function handleFileChange(e) {
     setSelectedFile(e.target.files[0]);
   }
 
-  // Submit form data with optional new image
-  async function hadleEditBook() {
+  // ✅ Form submission with validation
+  const handleEditBook = async (e) => {
+    e.preventDefault();
+
+    if (
+      !data.title ||
+      !data.isbn ||
+      !data.author ||
+      !data.numberOfCopies ||
+      data.numberOfCopies <= 0
+    ) {
+      toast.error("Please fill in all required fields properly!");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("book", new Blob([JSON.stringify(data)], { type: "application/json" }));
     if (selectedFile) {
@@ -70,79 +78,133 @@ export const EditBook = () => {
     try {
       const response = await fetch(`http://localhost:8181/api/books/edit/${id}`, {
         method: "PUT",
-        body: formData, // Browser sets Content-Type automatically
+        body: formData,
       });
 
       if (response.ok) {
-        alert("Updated Successfully");
-        navigate("/books");
+        toast.success("Book updated successfully!");
+        setTimeout(() => navigate("/books"), 1500);
       } else {
-        alert("Failed to update book");
+        toast.error("Failed to update book!");
       }
     } catch (err) {
-      alert("Failed to update book: " + err.message);
+      toast.error("Error: " + err.message);
     }
-  }
+  };
 
   return (
-    <div className="editbook-container mx-auto mt-5 w-50 p-5 shadow rounded">
-      <h1 className="editbook-title display-4 mb-4 text-center">Edit Book</h1>
+    <>
+      <ToastContainer position="top-right" autoClose={2000} hideProgressBar />
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      <div className="editbook-container mx-auto mt-5 w-50 p-5 shadow rounded">
+        <h1 className="editbook-title display-6 mb-4 text-center">Edit Book</h1>
 
-      <div className="editbook-form d-flex flex-column gap-4">
-        <input
-          type="text"
-          className="editbook-input form-control"
-          placeholder="Title"
-          value={data.title}
-          onChange={e => updateData({ ...data, title: e.target.value })}
-        />
+        {error && <div className="alert alert-danger">{error}</div>}
 
-        <input
-          type="text"
-          className="editbook-input form-control"
-          placeholder="ISBN"
-          value={data.isbn}
-          onChange={e => updateData({ ...data, isbn: e.target.value })}
-        />
+        <form className="d-flex flex-column gap-3" onSubmit={handleEditBook}>
+          {/* Title */}
+          <div>
+            <label className="fw-semibold small">
+              Title <span className="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              placeholder="Enter book title"
+              value={data.title}
+              onChange={(e) => updateData({ ...data, title: e.target.value })}
+              required
+            />
+          </div>
 
-        <input
-          type="number"
-          className="editbook-input form-control"
-          placeholder="Copies"
-          value={data.numberOfCopies}
-          onChange={e => updateData({ ...data, numberOfCopies: e.target.value })}
-        />
+          {/* ISBN */}
+          <div>
+            <label className="fw-semibold small">
+              ISBN <span className="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              placeholder="Enter ISBN"
+              value={data.isbn}
+              onChange={(e) => updateData({ ...data, isbn: e.target.value })}
+              required
+            />
+          </div>
 
-        <input
-          type="text"
-          className="editbook-input form-control"
-          placeholder="Author"
-          value={data.author}
-          onChange={e => updateData({ ...data, author: e.target.value })}
-        />
+          {/* Copies */}
+          <div>
+            <label className="fw-semibold small">
+              Number of Copies <span className="text-danger">*</span>
+            </label>
+            <input
+              type="number"
+              className="form-control form-control-sm"
+              placeholder="Enter number of copies"
+              value={data.numberOfCopies}
+              onChange={(e) =>
+                updateData({
+                  ...data,
+                  numberOfCopies: Math.max(1, Number(e.target.value)),
+                })
+              }
+              required
+              min="1"
+            />
+          </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-        />
+          {/* Author */}
+          <div>
+            <label className="fw-semibold small">
+              Author Name <span className="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              placeholder="Enter author name"
+              value={data.author}
+              onChange={(e) => updateData({ ...data, author: e.target.value })}
+              required
+            />
+          </div>
 
-        {/* Image preview */}
-        <div className="mt-3 text-center">
-          <img
-            src={previewUrl || (data.imagePath ? `http://localhost:8181${data.imagePath}` : "/default-image.png")}
-            alt="Book Cover Preview"
-            height="200"
-            style={{ objectFit: "contain" }}
-          />
-        </div>
+          {/* Image Upload */}
+          <div>
+            <label className="fw-semibold small">
+              Book Cover Image <span className="text-danger">*</span>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              className="form-control form-control-sm"
+              onChange={handleFileChange}
+            />
+          </div>
 
-        <button className="editbook-btn btn btn-primary align-self-center px-5 mt-3" onClick={hadleEditBook}>
-          Save Changes
-        </button>
+          {/* Image Preview */}
+          <div className="mt-2 text-center">
+            <img
+              src={
+                previewUrl ||
+                (data.imagePath
+                  ? `http://localhost:8181${data.imagePath}`
+                  : "/default-image.png")
+              }
+              alt="Book Cover Preview"
+              height="180"
+              style={{ objectFit: "contain" }}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="btn btn-dark btn-sm align-self-center px-4 mt-3"
+          >
+            Save Changes
+          </button>
+        </form>
       </div>
-    </div>
+    </>
   );
-}
+};
