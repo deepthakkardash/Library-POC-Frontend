@@ -19,9 +19,13 @@ export const BookList = () => {
 
   // Fetch books and borrowed books data (on mount)
   useEffect(() => {
-    axios.get("http://localhost:8181/api/books/all")
+    axios.get("http://localhost:8080/api/books/all",{
+       withCredentials: true,
+    })
       .then((booksResponse) => {
-        axios.get("http://localhost:8181/api/borrow/" + userId)
+        axios.get("http://localhost:8080/api/borrow/" + userId,{
+          withCredentials: true,
+        })
           .then((borrowedResponse) => {
             const borrowed = borrowedResponse.data.data;
             const booksWithBorrowFlag = booksResponse.data.data.map(book => ({
@@ -66,9 +70,10 @@ export const BookList = () => {
   async function deleteHandle(e, id) {
     e.stopPropagation();
     if (window.confirm("Are You Sure?")) {
-      const response = await fetch("http://localhost:8181/api/books/" + id, {
+      const response = await fetch("http://localhost:8080/api/books/" + id, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
+        credentials: "include"
       });
 
       if (response.ok) {
@@ -84,18 +89,23 @@ export const BookList = () => {
   async function borrowBookHandle(e, bookId) {
     e.stopPropagation();
 
-    const response = await fetch("http://localhost:8181/api/borrow/bookborrow", {
+    const response = await fetch("http://localhost:8080/api/borrow/bookborrow", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ bookId, userId }),
+      credentials: "include"
     });
 
     if (response.ok) {
       toast("Borrowed Successfully");
       // Refetch all books and borrowed list after borrowing
-      axios.get("http://localhost:8181/api/books/all")
+      axios.get("http://localhost:8080/api/books/all",{
+        withCredentials:true
+      })
         .then((booksResponse) => {
-          axios.get("http://localhost:8181/api/borrow/" + userId)
+          axios.get("http://localhost:8080/api/borrow/" + userId,{
+            withCredentials: true 
+          })
             .then((borrowedResponse) => {
               const borrowed = borrowedResponse.data.data;
               const booksWithBorrowFlag = booksResponse.data.data.map(book => ({
@@ -177,7 +187,7 @@ export const BookList = () => {
               onClick={(e) => showBookHandle(e, book.bookId)}
             >
               <img
-                src={book.imagePath ? `http://localhost:8181${book.imagePath}` : defaultimg}
+                src={book.imagePath ? `http://localhost:8080${book.imagePath}` : defaultimg}
                 className='w-100 p-3'
                 height={"200px"}
                 alt={book.title}

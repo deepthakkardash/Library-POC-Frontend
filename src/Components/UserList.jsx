@@ -3,7 +3,7 @@ import useFetch from '../Hooks/useFetch';
 import { useNavigate } from 'react-router-dom';
 
 export const UserList = () => {
-  let {data,loading,error}=useFetch("http://localhost:8181/api/users/all");
+  let {data,loading,error}=useFetch("http://localhost:8080/api/users/all");
   
   let navigate=useNavigate();
 

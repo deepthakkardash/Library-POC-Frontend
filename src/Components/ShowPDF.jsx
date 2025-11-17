@@ -9,7 +9,7 @@ export const ShowPDF = () => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.0);
-  let urlpdf="http://localhost:8181/uploads/books/pdfs/Book_ISBN_3321.pdf";
+  let urlpdf="http://localhost:8080/uploads/books/pdfs/Book_ISBN_3321.pdf";
 
   let {id} = useParams();
   console.log("ID : "+id);
