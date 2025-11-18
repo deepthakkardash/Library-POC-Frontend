@@ -24,7 +24,7 @@ export const Home = () => {
   };
 
   useEffect(()=>{
-    axios.get("http://localhost:8181/api/borrow/mostBorrowed")
+    axios.get("http://localhost:8080/api/borrow/mostBorrowed")
     .then((response)=>{
         // console.log(response.data.data);
         setMostBorrowedBooks(response.data.data);
@@ -36,7 +36,7 @@ export const Home = () => {
 })
 
 
-  axios.get("http://localhost:8181/api/books/newlyadded")
+  axios.get("http://localhost:8080/api/books/newlyadded")
   .then((response)=>{
     console.log(response.data.data);
     
@@ -83,7 +83,7 @@ export const Home = () => {
                           onClick={(e) => showBookHandle(e, book.bookId)}
                         >
                           <img
-                            src={book.imagePath ? `http://localhost:8181${book.imagePath}` : defaultimg}
+                            src={book.imagePath ? `http://localhost:8080${book.imagePath}` : defaultimg}
                             className='w-100 p-3'
                             height={"200px"}
                             alt={book.title}
@@ -104,7 +104,7 @@ export const Home = () => {
     {newBooks.map((item) => (
       <div className='py-4' key={item.bookId} onClick={(e) => showBookHandle(e, item.bookId)}>
         <img
-          src={`http://localhost:8181${item.imagePath}`}
+          src={`http://localhost:8080${item.imagePath}`}
           alt={item.title}
           style={{
             height: "360px",

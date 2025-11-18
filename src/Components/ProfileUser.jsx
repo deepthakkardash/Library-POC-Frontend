@@ -21,7 +21,7 @@ export const ProfileUser = () => {
   useEffect(() => {
     let username = localStorage.getItem("username");
     axios
-      .get("http://localhost:8181/api/users/user/" + username)
+      .get("http://localhost:8080/api/users/user/" + username)
       .then((response) => {
         const userData = response.data.data;
         setUserdata({
@@ -32,7 +32,7 @@ export const ProfileUser = () => {
         });
 
         // Use returned userId from user data, not from localStorage
-        axios.get("http://localhost:8181/api/borrow/history/" + userData.userId)
+        axios.get("http://localhost:8080/api/borrow/history/" + userData.userId)
           .then((borrowedResponse) => {
             setHistoryData(borrowedResponse.data.data);
           })

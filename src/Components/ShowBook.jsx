@@ -23,7 +23,7 @@ export const ShowBook = () => {
   let [error, setError] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:8181/api/books/" + id)
+    axios.get("http://localhost:8080/api/books/" + id)
       .then((response) => {
         console.log(response.data.data);
         
@@ -52,7 +52,7 @@ export const ShowBook = () => {
   <div className="row justify-content-center align-items-center">
     <div className="col-md-4 d-flex justify-content-center align-items-start">
       <img
-        src={data.imagePath?`http://localhost:8181${data.imagePath}`:defaultimg}
+        src={data.imagePath?`http://localhost:8080${data.imagePath}`:defaultimg}
         alt={data.title}
         className="book-details-img"
       />

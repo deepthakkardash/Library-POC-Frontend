@@ -8,7 +8,7 @@ export const ShowUser = () => {
   let [userdata, setuserdata] = useState({ userId: 0, userName: "", userType: "", booksBorrowed: 0 ,createdOn:""});
 
   useEffect(() => {
-    axios.get("http://localhost:8181/api/users/userid/" + id)
+    axios.get("http://localhost:8080/api/users/userid/" + id)
       .then((response) => {
         setuserdata({
           userId: response.data.data.userId,

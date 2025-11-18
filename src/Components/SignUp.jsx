@@ -25,7 +25,7 @@ export const SignUp = () => {
   const hadleSignup = async (e) => {
     if (!validate()) return; // If validation fails, stop here
 
-    const response = await fetch("http://localhost:8181/api/auth/signup", {
+    const response = await fetch("http://localhost:8080/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password, usertype }),

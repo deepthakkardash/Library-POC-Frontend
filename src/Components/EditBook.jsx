@@ -23,7 +23,7 @@ export const EditBook = () => {
 
   // ✅ Fetch existing book details
   useEffect(() => {
-    axios.get(`http://localhost:8181/api/books/${id}`)
+    axios.get(`http://localhost:8080/api/books/${id}`)
       .then((response) => {
         const book = response.data.data;
         updateData({
@@ -76,7 +76,7 @@ export const EditBook = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8181/api/books/edit/${id}`, {
+      const response = await fetch(`http://localhost:8080/api/books/edit/${id}`, {
         method: "PUT",
         body: formData,
       });
@@ -187,7 +187,7 @@ export const EditBook = () => {
               src={
                 previewUrl ||
                 (data.imagePath
-                  ? `http://localhost:8181${data.imagePath}`
+                  ? `http://localhost:8080${data.imagePath}`
                   : "/default-image.png")
               }
               alt="Book Cover Preview"

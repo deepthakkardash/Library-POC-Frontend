@@ -21,7 +21,7 @@ export const Borrowed = () => {
  
 
   useEffect(() => {
-    axios.get("http://localhost:8181/api/borrow/" + userId)
+    axios.get("http://localhost:8080/api/borrow/" + userId)
       .then((response) => {
         setBooks(response.data.data)
         console.log( "response data");
@@ -39,11 +39,11 @@ export const Borrowed = () => {
     e.stopPropagation();
     if (confirm("Are you really want to return?")) {
       const response = await fetch(
-        `http://localhost:8181/api/borrow/return?userId=${userId}&bookId=${bookId}`);
+        `http://localhost:8080/api/borrow/return?userId=${userId}&bookId=${bookId}`);
       if (response.ok) {
         // alert("Deleted successfully");
         toast("Returned")
-        axios.get(`http://localhost:8181/api/borrow/${userId}`)
+        axios.get(`http://localhost:8080/api/borrow/${userId}`)
           .then((response) => setBooks(response.data.data))
           .catch(() => alert("Failed to refresh borrowed books"));
       } else if (response.status === 404) {
@@ -88,7 +88,7 @@ export const Borrowed = () => {
             Borrowedbooks.map((book) => (
               <>
               <div className='shadow card w-100 d-flex flex-column justify-content-center align-items-center custcard' key={book.book.bookId} onClick={(e) => showBookHandle(e, book.book.bookId)}>
-                <img src={book.book.imagePath?`http://localhost:8181${book.book.imagePath}`:defaultimg} height={"200px"} alt="Book cover" className='w-100 p-3' />
+                <img src={book.book.imagePath?`http://localhost:8080${book.book.imagePath}`:defaultimg} height={"200px"} alt="Book cover" className='w-100 p-3' />
                 <h1 className='fs-4 my-2'>{book.book.title}</h1>
                 <p className='fst-italic text-secondary mb-3'>ISBN: {book.book.isbn}</p>
                 <p className='fst-italic text-secondary mb-3'>Borrowed : {timeAgo(book.issueDate)}</p>

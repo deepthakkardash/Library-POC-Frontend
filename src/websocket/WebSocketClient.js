@@ -5,7 +5,7 @@ import { over } from "stompjs";
 let stompClient = null;
 
 export const connectWebSocket = (onBookAdded, onNotification, userId) => {
-  const socket = new SockJS("http://localhost:8181/ws");
+  const socket = new SockJS("http://localhost:8080/ws");
   stompClient = over(socket);
 
   stompClient.connect({}, () => {
@@ -38,7 +38,7 @@ export const connectWebSocket = (onBookAdded, onNotification, userId) => {
       onNotification && onNotification(data);
     });
 
-    // 🔹 Private notification (specific user/admin)
+    //  Private notification (specific user/admin)
     if (userId) {
       stompClient.subscribe(`/queue/user-${userId}`, (message) => {
         const data = JSON.parse(message.body);
