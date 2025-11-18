@@ -35,7 +35,9 @@ function useFetch(api) {
   useEffect(() => {
     let isMounted = true; 
 
-    axios.get(api)
+    axios.get(api, {
+      withCredentials: true
+    })
       .then((response) => {
         if (isMounted) {
           setData(response.data.data);

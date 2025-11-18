@@ -49,7 +49,9 @@ export const AddBook = () => {
     formData.append("pdf", pdfFile);
 
     try {
-      await axios.post("http://localhost:8080/api/books/add", formData);
+      await axios.post("http://localhost:8080/api/books/add", formData,{
+          withCredentials: true, 
+      });
       toast.success("Book added successfully!");
       setTimeout(() => navigate("/books"), 1500);
     } catch (error) {

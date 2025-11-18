@@ -21,7 +21,9 @@ export const Borrowed = () => {
  
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/borrow/" + userId)
+    axios.get("http://localhost:8080/api/borrow/" + userId, {
+      withCredentials: true
+    })
       .then((response) => {
         setBooks(response.data.data)
         console.log( "response data");
@@ -39,11 +41,16 @@ export const Borrowed = () => {
     e.stopPropagation();
     if (confirm("Are you really want to return?")) {
       const response = await fetch(
-        `http://localhost:8080/api/borrow/return?userId=${userId}&bookId=${bookId}`);
+        `http://localhost:8080/api/borrow/return?userId=${userId}&bookId=${bookId}`,{
+          method: "GET",
+          credentials: "include",
+        });
       if (response.ok) {
         // alert("Deleted successfully");
         toast("Returned")
-        axios.get(`http://localhost:8080/api/borrow/${userId}`)
+        axios.get(`http://localhost:8080/api/borrow/${userId}`,{
+          withCredentials: true
+        })
           .then((response) => setBooks(response.data.data))
           .catch(() => alert("Failed to refresh borrowed books"));
       } else if (response.status === 404) {

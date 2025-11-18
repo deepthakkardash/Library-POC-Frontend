@@ -24,7 +24,9 @@ export const Home = () => {
   };
 
   useEffect(()=>{
-    axios.get("http://localhost:8080/api/borrow/mostBorrowed")
+    axios.get("http://localhost:8080/api/borrow/mostBorrowed",{
+      withCredentials: true
+    })
     .then((response)=>{
         // console.log(response.data.data);
         setMostBorrowedBooks(response.data.data);
@@ -36,7 +38,9 @@ export const Home = () => {
 })
 
 
-  axios.get("http://localhost:8080/api/books/newlyadded")
+  axios.get("http://localhost:8080/api/books/newlyadded",{
+    withCredentials: true
+  })
   .then((response)=>{
     console.log(response.data.data);
     

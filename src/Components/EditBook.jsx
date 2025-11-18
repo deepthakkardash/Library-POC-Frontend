@@ -23,7 +23,9 @@ export const EditBook = () => {
 
   // ✅ Fetch existing book details
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/books/${id}`)
+    axios.get(`http://localhost:8080/api/books/${id}`,{
+      withCredentials: true
+    })
       .then((response) => {
         const book = response.data.data;
         updateData({
@@ -79,6 +81,7 @@ export const EditBook = () => {
       const response = await fetch(`http://localhost:8080/api/books/edit/${id}`, {
         method: "PUT",
         body: formData,
+        credentials: "include"
       });
 
       if (response.ok) {

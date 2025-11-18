@@ -39,10 +39,10 @@ export const SignUp = () => {
       
       console.log(data);
       
-      localStorage.setItem("username", data.data.userName);
-      localStorage.setItem("userid", data.data.userId);
-      localStorage.setItem("usertype", data.data.userType);
-      navigate("/home");
+      // localStorage.setItem("username", data.data.userName);
+      // localStorage.setItem("userid", data.data.userId);
+      // localStorage.setItem("usertype", data.data.userType);
+      navigate("/");
     }
     else {
       toast("Failed");

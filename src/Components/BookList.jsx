@@ -19,9 +19,13 @@ export const BookList = () => {
 
   // Fetch books and borrowed books data (on mount)
   useEffect(() => {
-    axios.get("http://localhost:8080/api/books/all")
+    axios.get("http://localhost:8080/api/books/all",{
+       withCredentials: true,
+    })
       .then((booksResponse) => {
-        axios.get("http://localhost:8080/api/borrow/" + userId)
+        axios.get("http://localhost:8080/api/borrow/" + userId,{
+          withCredentials: true,
+        })
           .then((borrowedResponse) => {
             const borrowed = borrowedResponse.data.data;
             const booksWithBorrowFlag = booksResponse.data.data.map(book => ({
@@ -68,7 +72,8 @@ export const BookList = () => {
     if (window.confirm("Are You Sure?")) {
       const response = await fetch("http://localhost:8080/api/books/" + id, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
+        credentials: "include"
       });
 
       if (response.ok) {
@@ -88,14 +93,19 @@ export const BookList = () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ bookId, userId }),
+      credentials: "include"
     });
 
     if (response.ok) {
       toast("Borrowed Successfully");
       // Refetch all books and borrowed list after borrowing
-      axios.get("http://localhost:8080/api/books/all")
+      axios.get("http://localhost:8080/api/books/all",{
+        withCredentials:true
+      })
         .then((booksResponse) => {
-          axios.get("http://localhost:8080/api/borrow/" + userId)
+          axios.get("http://localhost:8080/api/borrow/" + userId,{
+            withCredentials: true 
+          })
             .then((borrowedResponse) => {
               const borrowed = borrowedResponse.data.data;
               const booksWithBorrowFlag = booksResponse.data.data.map(book => ({

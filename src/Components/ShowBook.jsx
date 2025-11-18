@@ -1,29 +1,19 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import book2pic from '../assets/book3.avif';
-import useTimeAgo from '../Hooks/useTimeAgo';
 import { timeAgo } from '../utility/timeAgo';
-
-
 import defaultimg from '../assets/default-book.png';
-
-
 
 export const ShowBook = () => {
   
-  // let {result}=useTimeAgo();
-  
-  
   let { id } = useParams();
-
-
-
   let [data, updateData] = useState({ title:"", isbn:"", numberOfCopies:0, author:"",createdOn:"",totalCopies:0,imagePath:"",category:""});
   let [error, setError] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/books/" + id)
+    axios.get("http://localhost:8080/api/books/" + id, {
+      withCredentials: true
+    })
       .then((response) => {
         console.log(response.data.data);
         
