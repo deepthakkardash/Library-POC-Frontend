@@ -28,19 +28,20 @@ export const Login = () => {
 
     let data=await response.json();
     if (response.ok) {
-      console.log(data);
-      
-        toast("Login successfully");
-        login();
-        // console.log(data.user.userId);
-        
-        console.log(data);
-        
-        localStorage.setItem("username",data.data.userName);
-        localStorage.setItem("userid",data.data.userId);
-        localStorage.setItem("usertype",data.data.userType);
-        navigate("/home");
-    }
+  toast("Login successfully");
+
+  login({
+    userId: data.data.userId,
+    username: data.data.userName,
+    userType: data.data.userType
+  });
+
+  localStorage.setItem("username",data.data.userName);
+  localStorage.setItem("userid",data.data.userId);
+  localStorage.setItem("usertype",data.data.userType);
+
+  navigate("/home");
+}
     else{
         console.log(data);
         

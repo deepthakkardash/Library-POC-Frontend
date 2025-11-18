@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom';
 import './App.css'
 import { AddBook } from './Components/AddBook';
 import { BookList } from './Components/BookList';
@@ -18,6 +18,7 @@ import { ShowPDF } from './Components/ShowPDF';
 import { pdfjs } from 'react-pdf';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { WebSocketProvider } from "./Context/WebSocketContext";
 
 function App() {
   pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -27,25 +28,37 @@ function App() {
       <BrowserRouter>
         <LoginProvider>
           <Navbar />
+
           <Routes>
+            {/* Public */}
             <Route path='/' element={<Login />} />
             <Route path='/signup' element={<SignUp />} />
 
+            {/* Protected Area */}
             <Route element={<ProtectedRoute />}>
-              <Route path='/home' element={<Home />} />
-              <Route path='/books' element={<BookList />} />
-              <Route path='/borrowed' element={<Borrowed />} />
-              <Route path='/showpdf/:id' element={<ShowPDF />} />
-              <Route path='/addbook' element={<AddBook />} />
-              <Route path='/book/:id' element={<ShowBook />} />
-              <Route path='/edit/:id' element={<EditBook />} />
-              <Route path='/userlist' element={<UserList />} />
-              <Route path='/userlist/user/:id' element={<ShowUser />} />
-              <Route path='/profile' element={<ProfileUser />} />
+              {/* WebSocketProvider only used inside protected layout */}
+              <Route
+                element={
+                  <WebSocketProvider>
+                    <Outlet />
+                  </WebSocketProvider>
+                }
+              >
+                <Route path='/home' element={<Home />} />
+                <Route path='/books' element={<BookList />} />
+                <Route path='/borrowed' element={<Borrowed />} />
+                <Route path='/showpdf/:id' element={<ShowPDF />} />
+                <Route path='/addbook' element={<AddBook />} />
+                <Route path='/book/:id' element={<ShowBook />} />
+                <Route path='/edit/:id' element={<EditBook />} />
+                <Route path='/userlist' element={<UserList />} />
+                <Route path='/userlist/user/:id' element={<ShowUser />} />
+                <Route path='/profile' element={<ProfileUser />} />
+              </Route>
             </Route>
           </Routes>
 
-          {/* ✅ Global toast container (visible on all pages) */}
+          {/* Global Toast */}
           <ToastContainer
             position="top-right"
             autoClose={7000}
