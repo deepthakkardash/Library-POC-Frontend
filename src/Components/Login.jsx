@@ -35,6 +35,12 @@ export const Login = () => {
 
       console.log(data);
 
+       // 🔥 FIX-1 → Set isLoggedIn = true
+      localStorage.setItem("isLoggedIn", "true");
+
+      // 🔥 Also store user ID so private queue works
+      localStorage.setItem("userId", data.data.user.userId);
+
       localStorage.setItem("username", data.data.user.userName);
       localStorage.setItem("userid", data.data.user.userId);
       localStorage.setItem("usertype", data.data.user.userType);

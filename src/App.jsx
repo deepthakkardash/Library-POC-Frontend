@@ -25,11 +25,12 @@ function App() {
   return (
     <div>
       <BrowserRouter>
-        <LoginProvider>
+        
           <Navbar />
           <Routes>
             <Route path='/' element={<Login />} />
             <Route path='/signup' element={<SignUp />} />
+
 
             <Route element={<ProtectedRoute />}>
               <Route path='/home' element={<Home />} />
@@ -55,7 +56,7 @@ function App() {
             pauseOnHover
             theme="colored"
           />
-        </LoginProvider>
+      
       </BrowserRouter>
     </div>
   );
