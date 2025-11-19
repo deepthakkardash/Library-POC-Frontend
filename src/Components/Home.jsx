@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
+import { toast } from 'react-toastify';
 
 export const Home = () => {
 
@@ -51,9 +52,43 @@ export const Home = () => {
   .catch(()=>{
     console.log("Failed");
   })
+
+
+  axios.get("http://localhost:8080/notifications/user/unread",{
+    withCredentials: true
+  })
+  .then((response)=>{
+    console.log("unread");
+    
+    console.log(response.data);
+
+    response.data.map((noti,idx)=>{
+      toast.success(noti.message);
+      markRead(noti.notf_id);
+    });
+    // toast.success(response.data)
+    
+    // setNewBooks(response.data.data);
+    // console.log(newBooks);
+    
+  })
+  .catch(()=>{
+    console.log("Failed");
+  })
+
+
+
+
   },[]);
 
 
+
+  const markRead = async (id) => {
+  await fetch(`http://localhost:8080/notifications/read/${id}`, {
+    method: "PUT",
+    credentials:"include"
+  });
+  }
 
   function showBookHandle(e,bookId)
   {
