@@ -21,7 +21,7 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     return () => disconnectWebSocket();
-  }, [logged, userId, userType]);
+  }, []);
 
   return (
     <WebSocketContext.Provider value={{}}>

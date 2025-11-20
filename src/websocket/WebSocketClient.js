@@ -4,7 +4,15 @@ import { getJwt } from "./getJwt";
 
 let stompClient = null;
 
+let isConnected = false;
+
 export const connectWebSocket = async(onBookAdded, onNotification, userId, userType) => {
+
+  if (isConnected) {
+    console.log("🟡 WebSocket already connected, skipping...");
+    return;
+  }
+  isConnected = true;
 
   const token = await getJwt();
   if (!token) {
@@ -21,12 +29,6 @@ const socket = new SockJS(`http://localhost:8080/ws?token=Bearer ${token}`, null
   stompClient.connect({}, () => {
     console.log("✅ Connected to WebSocket");
 
-    // 🔹 Broadcast or user-level notification (from backend)
-    // stompClient.subscribe("/topic/user", (message) => {
-    //   const data = JSON.parse(message.body);
-    //   console.log("📢 User Notification (from /topic/user):", data);
-    //   onNotification && onNotification(data);
-    // });
 
     // 🔹 When admin adds a book → notify all users
     stompClient.subscribe("/topic/books", (message) => {
@@ -43,43 +45,6 @@ const socket = new SockJS(`http://localhost:8080/ws?token=Bearer ${token}`, null
       });
     }
 
-     // Private notification for logged-in user
-    stompClient.subscribe("/user/queue/notification", (message) => {
-      const data = JSON.parse(message.body);
-      onNotification && onNotification(data);
-    });
-
- 
-
-    // 🔹 When any user borrows → notify all admins
-    // stompClient.subscribe("/topic/admin", (message) => {
-    //   const data = JSON.parse(message.body);
-    //   console.log("🔔 Admin Notification (from /topic/admin):", data);
-    //   onNotification && onNotification(data);
-    // });
-
-    // 🔹 Broadcast or user-level notification (from backend)
-    // stompClient.subscribe("/topic/user", (message) => {
-    //   const data = JSON.parse(message.body);
-    //   console.log("📢 User Notification (from /topic/user):", data);
-    //   onNotification && onNotification(data);
-    // });
-
-    // stompClient.subscribe("/topic/all", (message) => {
-    //   const data = JSON.parse(message.body);
-    //   console.log("🌍 Broadcast Notification (from /topic/all):", data);
-    //   onNotification && onNotification(data);
-    // });
-
-    //  Private notification (specific user/admin)
-    // if (userId) {
-    //   stompClient.subscribe(`/queue/user-${userId}`, (message) => {
-    //     const data = JSON.parse(message.body);
-    //     console.log(`📬 Private Notification for User ${userId}:`, data);
-    //     onNotification && onNotification(data);
-    //   });
-    // }
-
   }, (error) => {
     console.error("❌ WebSocket connection failed:", error);
   });
@@ -87,6 +52,9 @@ const socket = new SockJS(`http://localhost:8080/ws?token=Bearer ${token}`, null
 
 export const disconnectWebSocket = () => {
   if (stompClient) {
-    stompClient.disconnect(() => console.log("🔌 Disconnected from WebSocket"));
+    stompClient.disconnect(() => {
+      console.log("🔌 Disconnected WS");
+      isConnected = false;
+    });
   }
 };
