@@ -27,6 +27,9 @@ export let LoginProvider = ({ children }) => {
     localStorage.removeItem('usertype');
     // Remove stored logged flag as well
     localStorage.removeItem('logged');
+
+    localStorage.removeItem("show_unread_on_home");
+    localStorage.removeItem("isLoggedIn");  
   }
 
   return (

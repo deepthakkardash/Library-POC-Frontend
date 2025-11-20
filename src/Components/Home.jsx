@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 export const Home = () => {
 
@@ -23,6 +23,13 @@ export const Home = () => {
     slidesToScroll: 1,
     autoplay: true,
   };
+
+   const markRead = async (id) => {
+  await fetch(`http://localhost:8080/notifications/read/${id}`, {
+    method: "PUT",
+    credentials:"include"
+  });
+  }
 
   useEffect(()=>{
     axios.get("http://localhost:8080/api/borrow/mostBorrowed",{
@@ -54,41 +61,35 @@ export const Home = () => {
   })
 
 
-  axios.get("http://localhost:8080/notifications/user/unread",{
-    withCredentials: true
-  })
-  .then((response)=>{
-    console.log("unread");
-    
-    console.log(response.data);
-
-    response.data.map((noti,idx)=>{
-      toast.success(noti.message);
-      markRead(noti.notf_id);
-    });
-    // toast.success(response.data)
-    
-    // setNewBooks(response.data.data);
-    // console.log(newBooks);
-    
-  })
-  .catch(()=>{
-    console.log("Failed");
-  })
-
-
-
-
   },[]);
 
 
+  useEffect(() => {
 
-  const markRead = async (id) => {
-  await fetch(`http://localhost:8080/notifications/read/${id}`, {
-    method: "PUT",
-    credentials:"include"
-  });
+  // Only run when login just happened
+  if (localStorage.getItem("show_unread_on_home") !== "true") {
+    return;
   }
+
+  axios.get("http://localhost:8080/notifications/user/unread", {
+    withCredentials: true
+  })
+  .then(response => {
+    response.data.forEach(noti => {
+      toast.success(noti.message);
+
+      fetch(`http://localhost:8080/notifications/read/${noti.notf_id}`, {
+        method: "PUT",
+        credentials: "include"
+      });
+    });
+
+    // Stop future triggering
+    localStorage.removeItem("show_unread_on_home");
+  })
+  .catch(err => console.log("Unread fetch failed", err));
+
+}, []); 
 
   function showBookHandle(e,bookId)
   {
@@ -121,6 +122,19 @@ export const Home = () => {
                           key={book.bookId}
                           onClick={(e) => showBookHandle(e, book.bookId)}
                         >
+
+                          <ToastContainer position="top-right"
+                            autoClose={2000}
+                            hideProgressBar={false}
+                            newestOnTop={false}
+                            closeOnClick
+                            pauseOnFocusLoss
+                            draggable
+                            pauseOnHover
+                            theme="light"
+                          />
+
+
                           <img
                             src={book.imagePath ? `http://localhost:8080${book.imagePath}` : defaultimg}
                             className='w-100 p-3'

@@ -5,6 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import '../App.css'
 import { toast, ToastContainer } from 'react-toastify';
 import bg from '../assets/loginbg.jpg';
+import axios from 'axios';
 
 export const Login = () => {
 
@@ -14,6 +15,10 @@ export const Login = () => {
   let [username, setUsername] = useState("");
   let [password, setpassword] = useState("");
   let [usertype, setusertype] = useState("Admin");
+
+
+
+
 
 
   const hadleLogin = async (e) => {
@@ -44,6 +49,11 @@ export const Login = () => {
       localStorage.setItem("username", data.data.user.userName);
       localStorage.setItem("userid", data.data.user.userId);
       localStorage.setItem("usertype", data.data.user.userType);
+
+      localStorage.setItem("show_unread_on_home", "true");
+
+
+      console.log("before navigate");
       navigate("/home");
     }
     else {
