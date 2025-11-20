@@ -1,12 +1,19 @@
-// src/websocket/WebSocketClient.js
 import SockJS from "sockjs-client";
 import { over } from "stompjs";
+import { getJwt } from "./getJwt";
 
 let stompClient = null;
 
-export const connectWebSocket = (onBookAdded, onNotification, userId) => {
+export const connectWebSocket = async(onBookAdded, onNotification, userId, userType) => {
 
-  const socket = new SockJS("http://localhost:8080/ws", null, {
+  const token = await getJwt();
+  if (!token) {
+    console.error("❌ Cannot start WebSocket, JWT not available.");
+    return;
+  }
+
+  // Add token in Query Param
+const socket = new SockJS(`http://localhost:8080/ws?token=Bearer ${token}`, null, {
      withCredentials: true
   });
   stompClient = over(socket);
@@ -15,28 +22,43 @@ export const connectWebSocket = (onBookAdded, onNotification, userId) => {
     console.log("✅ Connected to WebSocket");
 
     // 🔹 Broadcast or user-level notification (from backend)
-    stompClient.subscribe("/topic/user", (message) => {
-      const data = JSON.parse(message.body);
-      console.log("📢 User Notification (from /topic/user):", data);
-      onNotification && onNotification(data);
-    });
-
-
-    // 🔹 When admin adds a book → notify all users
-    // stompClient.subscribe("/topic/books", (message) => {
+    // stompClient.subscribe("/topic/user", (message) => {
     //   const data = JSON.parse(message.body);
-    //   console.log("📚 New Book Added:", data);
-    //   onBookAdded && onBookAdded(data);
+    //   console.log("📢 User Notification (from /topic/user):", data);
+    //   onNotification && onNotification(data);
     // });
 
-    // 🔹 When any user borrows → notify all admins
-    stompClient.subscribe("/topic/admin", (message) => {
+    // 🔹 When admin adds a book → notify all users
+    stompClient.subscribe("/topic/books", (message) => {
       const data = JSON.parse(message.body);
-      console.log("🔔 Admin Notification (from /topic/admin):", data);
+      console.log("📚 New Book Added:", data);
+      onBookAdded && onBookAdded(data);
+    });
+
+    //  Borrow book → notify all admins
+    if (userType === "Admin") {
+      stompClient.subscribe("/topic/admin", (message) => {
+        const data = JSON.parse(message.body);
+        onNotification && onNotification(data);
+      });
+    }
+
+     // Private notification for logged-in user
+    stompClient.subscribe("/user/queue/notification", (message) => {
+      const data = JSON.parse(message.body);
       onNotification && onNotification(data);
     });
 
-    // // 🔹 Broadcast or user-level notification (from backend)
+ 
+
+    // 🔹 When any user borrows → notify all admins
+    // stompClient.subscribe("/topic/admin", (message) => {
+    //   const data = JSON.parse(message.body);
+    //   console.log("🔔 Admin Notification (from /topic/admin):", data);
+    //   onNotification && onNotification(data);
+    // });
+
+    // 🔹 Broadcast or user-level notification (from backend)
     // stompClient.subscribe("/topic/user", (message) => {
     //   const data = JSON.parse(message.body);
     //   console.log("📢 User Notification (from /topic/user):", data);

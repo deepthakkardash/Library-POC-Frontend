@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react'
-import useFetch from '../Hooks/useFetch'
 import { LoginContext } from '../Context/LoginContext';
 import { NavLink, useNavigate } from 'react-router-dom';
 import '../App.css'
@@ -8,7 +7,7 @@ import bg from '../assets/loginbg.jpg';
 
 export const Login = () => {
 
-  let { logged, login } = useContext(LoginContext);
+  let { login } = useContext(LoginContext);
   let navigate = useNavigate();
 
   let [username, setUsername] = useState("");
@@ -26,32 +25,47 @@ export const Login = () => {
     });
 
     let data = await response.json();
-    if (response.ok) {
-      console.log(data);
 
-      toast("Login successfully");
-      login();
-      // console.log(data.user.userId);
+  //   if (response.ok) {
+  //     console.log(data);
 
-      console.log(data);
+  //     toast("Login successfully");
+  //     const loggedUser = data.data.user;
 
-       // 🔥 FIX-1 → Set isLoggedIn = true
-      localStorage.setItem("isLoggedIn", "true");
+  //     login(loggedUser.userId, loggedUser.userName, loggedUser.userType);
+  //     // console.log(data.user.userId);
 
-      // 🔥 Also store user ID so private queue works
-      localStorage.setItem("userId", data.data.user.userId);
+  //     console.log(data);
 
-      localStorage.setItem("username", data.data.user.userName);
-      localStorage.setItem("userid", data.data.user.userId);
-      localStorage.setItem("usertype", data.data.user.userType);
+  //      // 🔥 FIX-1 → Set isLoggedIn = true
+  //     localStorage.setItem("isLoggedIn", "true");
+
+  //     // 🔥 Also store user ID so private queue works
+  //     localStorage.setItem("userId", data.data.user.userId);
+  //     localStorage.setItem("username", data.data.user.userName);
+  //     localStorage.setItem("usertype", data.data.user.userType);
+  //     navigate("/home");
+  //   }
+  //   else {
+  //     console.log(data);
+
+  //     toast(data.message);
+  //   }
+  // }
+
+  if (response.ok) {
+      toast("Login successful!");
+
+      const loggedUser = data.data.user;
+
+      // 🎯 Only this line required
+      login(loggedUser.userId, loggedUser.userName, loggedUser.userType);
+
       navigate("/home");
-    }
-    else {
-      console.log(data);
-
+    } else {
       toast(data.message);
     }
-  }
+  };
 
   return (
     <div className='' style={{ backgroundImage: bg }}>
