@@ -31,11 +31,13 @@ const socket = new SockJS(`http://localhost:8080/ws?token=Bearer ${token}`, null
 
 
     // 🔹 When admin adds a book → notify all users
+    if (userType === "User") {
     stompClient.subscribe("/topic/books", (message) => {
       const data = JSON.parse(message.body);
       console.log("📚 New Book Added:", data);
       onBookAdded && onBookAdded(data);
     });
+    }
 
     //  Borrow book → notify all admins
     if (userType === "Admin") {

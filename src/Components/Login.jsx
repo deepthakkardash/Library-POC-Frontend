@@ -15,11 +15,6 @@ export const Login = () => {
   let [password, setpassword] = useState("");
   let [usertype, setusertype] = useState("Admin");
 
-
-
-
-
-
   const hadleLogin = async (e) => {
     e.preventDefault();
     const response = await fetch("http://localhost:8080/api/auth/login", {
@@ -59,6 +54,9 @@ export const Login = () => {
   // }
 
   if (response.ok) {
+    
+      debugger;
+      
       toast("Login successful!");
 
       const loggedUser = data.data.user;
@@ -74,6 +72,9 @@ export const Login = () => {
 
 
       console.log("before navigate");
+
+      debugger;
+
       navigate("/home");
     } else {
       toast(data.message);
