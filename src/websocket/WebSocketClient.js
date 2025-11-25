@@ -1,62 +1,90 @@
 import SockJS from "sockjs-client";
 import { over } from "stompjs";
-import { getJwt } from "./getJwt";
 
 let stompClient = null;
-
 let isConnected = false;
 
-export const connectWebSocket = async(onBookAdded, onNotification, userId, userType) => {
-
-  if (isConnected) {
-    console.log("🟡 WebSocket already connected, skipping...");
+export const connectWebSocket = async (
+  onBookAdded,
+  onNotification,
+  userId,
+  userType
+) => {
+  if (isConnected && stompClient !== null) {
+    console.log("🟡 WebSocket already connected, ignoring...");
     return;
   }
-  isConnected = true;
 
-  const token = await getJwt();
+  const token = localStorage.getItem("token");
   if (!token) {
-    console.error("❌ Cannot start WebSocket, JWT not available.");
+    console.error("❌ Cannot start WebSocket, JWT missing.");
     return;
   }
 
-  // Add token in Query Param
-const socket = new SockJS(`http://localhost:8080/ws?token=Bearer ${token}`, null, {
-     withCredentials: true
-  });
+  // Create WebSocket
+  const socket = new SockJS("http://localhost:8080/ws");
   stompClient = over(socket);
 
-  stompClient.connect({}, () => {
-    console.log("✅ Connected to WebSocket");
+  stompClient.connect(
+    {
+      Authorization: "Bearer " + token,
+      userId: userId, // 👈 required for online tracking
+    },
+    () => {
+      console.log("✅ WebSocket Connected");
+      isConnected = true;
 
-
-    // 🔹 When admin adds a book → notify all users
-    if (userType === "User") {
-    stompClient.subscribe("/topic/books", (message) => {
-      const data = JSON.parse(message.body);
-      console.log("📚 New Book Added:", data);
-      onBookAdded && onBookAdded(data);
-    });
-    }
-
-    //  Borrow book → notify all admins
-    if (userType === "Admin") {
-      stompClient.subscribe("/topic/admin", (message) => {
+      // -------------------------------
+      // 👇 PERSONAL NOTIFICATION CHANNEL
+      // -------------------------------
+      stompClient.subscribe("/user/queue/notifications", (message) => {
+        debugger;
         const data = JSON.parse(message.body);
+        console.log("📨 Notification received :", data);
         onNotification && onNotification(data);
       });
-    }
 
-  }, (error) => {
-    console.error("❌ WebSocket connection failed:", error);
-  });
+      // -------------------------------
+      // 👇 PUBLIC CHANNELS
+      // -------------------------------
+      if (userType === "User") {
+        stompClient.subscribe("/topic/books", (message) => {
+          const data = JSON.parse(message.body);
+          onBookAdded && onBookAdded(data);
+        });
+      }
+
+      if (userType === "Admin") {
+        stompClient.subscribe("/topic/admin", (message) => {
+          const data = JSON.parse(message.body);
+          onNotification && onNotification(data);
+        });
+      }
+    },
+
+    (error) => {
+      console.error("❌ WebSocket Error:", error);
+      isConnected = false;
+
+      // Auto reconnect after 3 seconds
+      setTimeout(() => {
+        console.log("🔄 Reconnecting WebSocket...");
+        connectWebSocket(onBookAdded, onNotification, userId, userType);
+      }, 3000);
+    }
+  );
+
+  // Disable heartbeats for local dev
+  stompClient.heartbeat.outgoing = 0;
+  stompClient.heartbeat.incoming = 0;
 };
 
 export const disconnectWebSocket = () => {
-  if (stompClient) {
+  if (stompClient && isConnected) {
     stompClient.disconnect(() => {
-      console.log("🔌 Disconnected WS");
+      console.log("🔌 WebSocket Disconnected");
       isConnected = false;
+      stompClient = null;
     });
   }
 };

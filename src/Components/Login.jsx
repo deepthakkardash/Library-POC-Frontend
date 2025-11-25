@@ -64,6 +64,10 @@ export const Login = () => {
       // 🎯 Only this line required
       login(loggedUser.userId, loggedUser.userName, loggedUser.userType);
 
+      localStorage.setItem("token", data.data.token);
+      console.log("token", data.data);
+      
+
       localStorage.setItem("username", data.data.user.userName);
       localStorage.setItem("userid", data.data.user.userId);
       localStorage.setItem("usertype", data.data.user.userType);
