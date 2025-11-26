@@ -1,12 +1,11 @@
 import SockJS from "sockjs-client";
 import { over } from "stompjs";
-import { getJwt } from "./getJwt";
 
 let stompClient = null;
 
 let isConnected = false;
 
-export const connectWebSocket = async(onBookAdded, onNotification, userId, userType) => {
+export const connectWebSocket = (onBookAdded, onNotification, userId, userType) => {
 
   if (isConnected) {
     console.log("🟡 WebSocket already connected, skipping...");
@@ -14,20 +13,26 @@ export const connectWebSocket = async(onBookAdded, onNotification, userId, userT
   }
   isConnected = true;
 
-  const token = await getJwt();
+  const token = localStorage.getItem("token");
   if (!token) {
-    console.error("❌ Cannot start WebSocket, JWT not available.");
+    console.error("❌ No JWT in localStorage. User not logged in?");
     return;
   }
 
   // Add token in Query Param
-const socket = new SockJS(`http://localhost:8080/ws?token=Bearer ${token}`, null, {
-     withCredentials: true
-  });
+const socket = new SockJS("http://localhost:8080/ws"); 
   stompClient = over(socket);
 
-  stompClient.connect({}, () => {
-    console.log("✅ Connected to WebSocket");
+  stompClient.connect(
+    { Authorization: `Bearer ${token}` },
+      () => onConnected(onBookAdded, onNotification, userType),
+    onError
+  );
+};
+
+  const onConnected = (onBookAdded, onNotification, userType) => {
+  isConnected = true;
+  console.log("🟢 WebSocket Connected!");
 
 
     // 🔹 When admin adds a book → notify all users
@@ -44,14 +49,15 @@ const socket = new SockJS(`http://localhost:8080/ws?token=Bearer ${token}`, null
         onNotification && onNotification(data);
       });
     }
+  };
 
-  }, (error) => {
-    console.error("❌ WebSocket connection failed:", error);
-  });
+const onError = (error) => {
+  isConnected = false;
+  console.error("❌ WebSocket connection failed:", error);
 };
 
 export const disconnectWebSocket = () => {
-  if (stompClient) {
+  if (stompClient && isConnected ) {
     stompClient.disconnect(() => {
       console.log("🔌 Disconnected WS");
       isConnected = false;

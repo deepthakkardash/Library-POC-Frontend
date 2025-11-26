@@ -9,7 +9,6 @@ export const WebSocketProvider = ({ children }) => {
 
   const { logged, userId, userType } = useContext(LoginContext);
 
-
   useEffect(() => {
     if (logged && userId) {
       connectWebSocket(
@@ -21,7 +20,7 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     return () => disconnectWebSocket();
-  }, []);
+  }, [logged]);
 
   return (
     <WebSocketContext.Provider value={{}}>

@@ -26,39 +26,13 @@ export const Login = () => {
 
     let data = await response.json();
 
-  //   if (response.ok) {
-  //     console.log(data);
-
-  //     toast("Login successfully");
-  //     const loggedUser = data.data.user;
-
-  //     login(loggedUser.userId, loggedUser.userName, loggedUser.userType);
-  //     // console.log(data.user.userId);
-
-  //     console.log(data);
-
-  //      // 🔥 FIX-1 → Set isLoggedIn = true
-  //     localStorage.setItem("isLoggedIn", "true");
-
-  //     // 🔥 Also store user ID so private queue works
-  //     localStorage.setItem("userId", data.data.user.userId);
-  //     localStorage.setItem("username", data.data.user.userName);
-  //     localStorage.setItem("usertype", data.data.user.userType);
-  //     navigate("/home");
-  //   }
-  //   else {
-  //     console.log(data);
-
-  //     toast(data.message);
-  //   }
-  // }
-
   if (response.ok) {
       toast("Login successful!");
 
       const loggedUser = data.data.user;
 
-      // 🎯 Only this line required
+      localStorage.setItem("token", data.data.token);
+      //  Only this line required
       login(loggedUser.userId, loggedUser.userName, loggedUser.userType);
 
       navigate("/home");
