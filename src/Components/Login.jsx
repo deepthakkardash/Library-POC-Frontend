@@ -4,7 +4,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import '../App.css'
 import { toast, ToastContainer } from 'react-toastify';
 import bg from '../assets/loginbg.jpg';
-import axios from 'axios';
 
 export const Login = () => {
 

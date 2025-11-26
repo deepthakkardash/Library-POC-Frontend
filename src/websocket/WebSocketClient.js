@@ -28,7 +28,7 @@ export const connectWebSocket = async (
   stompClient.connect(
     {
       Authorization: "Bearer " + token,
-      userId: userId, // 👈 required for online tracking
+    //  userId: userId, // 👈 required for online tracking
     },
     () => {
       console.log("✅ WebSocket Connected");
