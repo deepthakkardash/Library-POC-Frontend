@@ -54,7 +54,7 @@ export const Login = () => {
 
   if (response.ok) {
     
-      debugger;
+     
       
       toast("Login successful!");
 
@@ -76,7 +76,7 @@ export const Login = () => {
 
       console.log("before navigate");
 
-      debugger;
+      
 
       navigate("/home");
     } else {
