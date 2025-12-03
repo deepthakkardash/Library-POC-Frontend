@@ -34,32 +34,20 @@ export const connectWebSocket = async (
       console.log("✅ WebSocket Connected");
       isConnected = true;
 
-      // -------------------------------
-      // 👇 PERSONAL NOTIFICATION CHANNEL
-      // -------------------------------
+
+      // PERSONAL NOTIFICATION CHANNEL
+
       stompClient.subscribe("/user/queue/notifications", (message) => {
-        debugger;
         const data = JSON.parse(message.body);
         console.log("📨 Notification received :", data);
+        
+        fetch(`http://localhost:8080/notifications/read/${data.notf_id}`, {
+        method: "PUT",
+        credentials: "include"
+      }); 
         onNotification && onNotification(data);
+
       });
-
-      // -------------------------------
-      // 👇 PUBLIC CHANNELS
-      // -------------------------------
-      if (userType === "User") {
-        stompClient.subscribe("/topic/books", (message) => {
-          const data = JSON.parse(message.body);
-          onBookAdded && onBookAdded(data);
-        });
-      }
-
-      if (userType === "Admin") {
-        stompClient.subscribe("/topic/admin", (message) => {
-          const data = JSON.parse(message.body);
-          onNotification && onNotification(data);
-        });
-      }
     },
 
     (error) => {
